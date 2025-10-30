@@ -7,21 +7,22 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Alert from "react-bootstrap/Alert";
 
-// Custom components (Named exports are imported using destructured braces)
+// Custom components
 import NeedsCalculator from "./components/NeedsCalculator.jsx";
 import FoodTracker, { Totals, MealList } from "./components/FoodTracker.jsx";
 import AppFooter from "./components/AppFooter.jsx";
 
-// Data Hook (Requires useFirebaseData.js and firebaseConfig.js to be implemented)
+// Data Hook
 import useFirebaseData from "./useFirebaseData.js";
 
-// --- LOGIC (NIN Calculation) ---
+// --- LOGIC (UPDATED TO USE DYNAMIC RECOMMENDATIONS ARRAY) ---
 const getRecommendedValues = (
   age,
   gender,
   femaleStatus,
   lactationPeriod,
-  workType
+  workType,
+  rules // <--- DYNAMIC RULES ARRAY PASSED HERE
 ) => {
   if (age < 1) {
     if (age * 12 < 7) {
@@ -31,80 +32,61 @@ const getRecommendedValues = (
       message: "Please consult a pediatrician for infants aged 7-12 months.",
     };
   }
-  if (age <= 3) return { calories: 1110, protein: 38 };
-  if (age <= 6) return { calories: 1370, protein: 46 };
-  if (age <= 9) return { calories: 1710, protein: 59 };
-  if (age <= 12) {
-    if (gender === "male") return { calories: 2230, protein: 76 };
-    if (gender === "female") return { calories: 2060, protein: 70 };
-  }
-  if (age <= 15) {
-    if (gender === "male") return { calories: 2860, protein: 95 };
-    if (gender === "female") {
-      if (
-        age >= 14 &&
-        (femaleStatus === "pregnant" || femaleStatus === "lactating")
-      ) {
-        if (femaleStatus === "pregnant") return { calories: 2020, protein: 72 };
-        if (femaleStatus === "lactating") {
-          if (lactationPeriod === "0-6m")
-            return { calories: 2245, protein: 77 };
-          if (lactationPeriod === "7-12m")
-            return { calories: 2200, protein: 78 };
-        }
+
+  // Find the matching rule in the fetched array
+  const recommendation = rules.find((rule) => {
+    const ageMatch = age >= rule.minAge && age <= rule.maxAge;
+    const genderMatch = rule.gender === "both" || rule.gender === gender;
+
+    let statusMatch = true;
+    if (gender === "female" || rule.gender === "both") {
+      // 1. Check for normal/baseline (n/a status in rule means baseline)
+      if (rule.status === "n/a" && femaleStatus === "normal") {
+        statusMatch = true;
       }
-      return { calories: 2410, protein: 81 };
-    }
-  }
-  if (age <= 18) {
-    if (gender === "male") return { calories: 3300, protein: 107 };
-    if (gender === "female") {
-      if (femaleStatus === "pregnant" || femaleStatus === "lactating") {
-        if (femaleStatus === "pregnant") return { calories: 2020, protein: 72 };
+      // 2. Handle specific status (pregnant/lactating)
+      else if (rule.status !== "n/a" && rule.status === femaleStatus) {
         if (femaleStatus === "lactating") {
-          if (lactationPeriod === "0-6m")
-            return { calories: 2245, protein: 77 };
-          if (lactationPeriod === "7-12m")
-            return { calories: 2200, protein: 78 };
+          // Check lactation period only if lactating
+          return (
+            ageMatch && genderMatch && rule.lactationPeriod === lactationPeriod
+          );
         }
+        statusMatch = true;
       }
-      return { calories: 2490, protein: 85 };
-    }
-  }
-  if (age <= 60) {
-    if (gender === "male") {
-      if (workType === "sedentary") return { calories: 1900, protein: 64 };
-      if (workType === "moderate") return { calories: 2400, protein: 82 };
-    }
-    if (gender === "female") {
-      if (
-        age <= 50 &&
-        (femaleStatus === "pregnant" || femaleStatus === "lactating")
-      ) {
-        if (femaleStatus === "pregnant") return { calories: 2020, protein: 72 };
-        if (femaleStatus === "lactating") {
-          if (lactationPeriod === "0-6m")
-            return { calories: 2245, protein: 77 };
-          if (lactationPeriod === "7-12m")
-            return { calories: 2200, protein: 78 };
-        }
+      // 3. Discard non-matching specific status rules
+      else if (rule.status !== femaleStatus && rule.status !== "both") {
+        statusMatch = false;
       }
-      if (workType === "sedentary") return { calories: 1660, protein: 58.5 };
-      if (workType === "moderate") return { calories: 2125, protein: 68 };
     }
+
+    // Match work type (only relevant for adult rules)
+    let workMatch = true;
+    if (rule.workType !== "n/a") {
+      workMatch = rule.workType === workType;
+    }
+
+    return ageMatch && genderMatch && statusMatch && workMatch;
+  });
+
+  if (recommendation) {
+    return {
+      calories: recommendation.calories,
+      protein: recommendation.protein,
+      message: null,
+    };
   }
-  if (age > 60) {
-    if (gender === "male") return { calories: 1740, protein: 62 };
-    if (gender === "female") return { calories: 1530, protein: 56 };
-  }
+
   return {
     message: "Please check the inputs. The combination is not covered.",
   };
 };
-// --- END OF LOGIC ---
+// --- END OF DYNAMIC LOGIC ---
 
 function App() {
-  const { foodData, isLoading, error } = useFirebaseData(); // --- STATE ---
+  // Use the hook and capture the recommendations array
+  const { foodData, recommendations, isLoading, error } = useFirebaseData(); // --- STATE ---
+
   const [selectedFoodId, setSelectedFoodId] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [mealList, setMealList] = useState([]);
@@ -126,7 +108,7 @@ function App() {
     return foodData.find((food) => food.id === selectedFoodId);
   }, [selectedFoodId, foodData]);
 
-  const currentOptions = currentFood ? currentFood.options : []; // --- HANDLERS ---
+  const currentOptions = currentFood ? currentFood.options : []; // --- HANDLERS (UPDATED to pass recommendations) ---
 
   const handleCalculateNeeds = () => {
     const numAge = parseFloat(age);
@@ -135,17 +117,21 @@ function App() {
       alert("Please enter a valid age.");
       return;
     }
-    const recommendations = getRecommendedValues(
+
+    // Pass the dynamic rules fetched from Firebase
+    const recommendationsResult = getRecommendedValues(
       numAge,
       gender,
       femaleStatus,
       lactationPeriod,
-      workType
+      workType,
+      recommendations // <--- PASSING DYNAMIC DATA
     );
+
     setDailyNeeds({
-      calories: recommendations.calories || 0,
-      protein: recommendations.protein || 0,
-      message: recommendations.message || null,
+      calories: recommendationsResult.calories || 0,
+      protein: recommendationsResult.protein || 0,
+      message: recommendationsResult.message || null,
     });
     if (!isNaN(numWeight) && numWeight > 0 && numAge >= 18) {
       setProteinByWeight(numWeight * 0.8);
@@ -210,13 +196,12 @@ function App() {
     (gender === "female" &&
       femaleStatus === "normal" &&
       numAge >= 14 &&
-      numAge <= 60); // --- Loading and Error State Handling ---
+      numAge <= 60); // --- Loading and Error State Handling --- // Check if loading is true OR if recommendations array is empty (meaning rules haven't loaded yet)
 
-  if (isLoading) {
+  if (isLoading || recommendations.length === 0) {
     return (
       <Container className="my-5 text-center">
-                <h1 className="text-primary">Loading Food Data... ⏳</h1>       {" "}
-        <p className="lead">Connecting to Firebase Firestore...</p>     {" "}
+                <h1 className="text-primary">Loading... ⏳</h1> 
       </Container>
     );
   }
@@ -227,10 +212,11 @@ function App() {
                {" "}
         <Alert variant="danger" className="text-center">
                     <h4 className="alert-heading">Data Fetch Error! 🛑</h4>     
-              <p>Could not load food data from Firebase: **{error}**</p>
+              <p>Could not load data from Firebase: **{error}**</p>
                     <hr />         {" "}
           <p className="mb-0">
-            Please check your Firebase configuration and network connection.
+                        Please check your Firebase configuration and network
+            connection.          {" "}
           </p>
                  {" "}
         </Alert>
@@ -253,7 +239,7 @@ function App() {
             className="display-4 fw-bold text-success"
             style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.1)" }}
           >
-                        Nutri Calci{" "}
+                        Nutri Calci {" "}
             <span style={{ fontSize: "0.8em" }}>🩺</span>         {" "}
           </h1>
                    {" "}
@@ -324,7 +310,7 @@ function App() {
         </Row>
              {" "}
       </Container>
-      <AppFooter />   {" "}
+            <AppFooter />   {" "}
     </div>
   );
 }

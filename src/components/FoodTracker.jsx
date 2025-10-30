@@ -370,79 +370,73 @@ export const Totals = ({
 };
 
 // --- Component: Meal Items List (Step 2) ---
+// src/components/FoodTracker.jsx (Updated MealList component only)
+
+// ... (Other imports remain the same) ...
+
+// --- Component: Meal Items List (Step 2) ---
 export const MealList = ({ mealList, handleRemoveFood, stepNumber }) => {
-  return (
-    <Card className="shadow">
-           {" "}
-      <Card.Header as="h2" className="h5 fw-semibold p-3 text-white bg-info">
-        {stepNumber}. Today's Meal Items
-      </Card.Header>
-           {" "}
-      {mealList.length === 0 ? (
-        <Card.Body>
-                   {" "}
-          <p className="text-center text-muted mb-0">
-            Add food items above to see them here.
-          </p>
-                 {" "}
-        </Card.Body>
-      ) : (
-        <ListGroup
-          variant="flush"
-          style={{ maxHeight: "400px", overflowY: "auto" }}
-        >
-                   {" "}
-          {mealList.map((item) => (
-            <ListGroup.Item
-              key={item.id}
-              action
-              className="d-flex align-items-center justify-content-between px-4 py-3"
-            >
-                            {/* Item Details (Name & Serving Size) */}         
-                 {" "}
-              <div className="me-2 text-truncate" style={{ flexBasis: "45%" }}>
-                               {" "}
-                <p className="h6 mb-0 fw-bold text-truncate">{item.name}</p>   
-                           {" "}
-                <small className="text-muted">{item.optionLabel}</small>       
-                     {" "}
-              </div>
-                                         {" "}
-              {/* Nutritional Info & Delete Button */}             {" "}
-              <div className="d-flex align-items-center flex-shrink-0">
-                               {" "}
-                <div className="text-end me-2 me-sm-3">
-                                   {" "}
-                  <p className="mb-0 fw-semibold text-success small">
-                    {item.calories.toFixed(1)} kcal
-                  </p>
-                                   {" "}
-                  <p className="mb-0 fw-semibold text-primary small">
-                    {item.protein.toFixed(1)} g
-                  </p>
-                                 {" "}
-                </div>
-                               {" "}
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={() => handleRemoveFood(item)}
-                  aria-label="Remove item"
-                  className="p-1"
-                >
-                                    <FiTrash2 size={14} />               {" "}
-                </Button>
-                             {" "}
-              </div>
-                         {" "}
-            </ListGroup.Item>
-          ))}
-                 {" "}
-        </ListGroup>
-      )}
-         {" "}
-    </Card>
-  );
+    
+    // Calculate max height for 5 items. 
+    // py-3 roughly results in 70px per item (adjust if theme changes spacing).
+    const MAX_HEIGHT_FOR_SCROLL = 5 * 70; 
+
+  return (
+    <Card className="shadow">
+      <Card.Header as="h2" className="h5 fw-semibold p-3 text-white bg-info">
+        {stepNumber}. Today's Meal Items
+      </Card.Header>
+      {mealList.length === 0 ? (
+        <Card.Body>
+          <p className="text-center text-muted mb-0">
+            Add food items above to see them here.
+          </p>
+        </Card.Body>
+      ) : (
+        <ListGroup
+          variant="flush"
+          // --- FIX APPLIED HERE ---
+          style={{ maxHeight: `${MAX_HEIGHT_FOR_SCROLL}px`, overflowY: "auto" }} // Set fixed height for 5 items
+          // --- END OF FIX ---
+        >
+          {mealList.map((item) => (
+            <ListGroup.Item
+              key={item.id}
+              action
+              className="d-flex align-items-center justify-content-between px-4 py-3"
+            >
+              {/* Item Details (Name & Serving Size) */}
+              <div className="me-2 text-truncate" style={{ flexBasis: "45%" }}>
+                <p className="h6 mb-0 fw-bold text-truncate">{item.name}</p>
+                <small className="text-muted">{item.optionLabel}</small>
+              </div>
+              
+              {/* Nutritional Info & Delete Button */}
+              <div className="d-flex align-items-center flex-shrink-0">
+                <div className="text-end me-2 me-sm-3">
+                  <p className="mb-0 fw-semibold text-success small">
+                    {item.calories.toFixed(1)} kcal
+                  </p>
+                  <p className="mb-0 fw-semibold text-primary small">
+                    {item.protein.toFixed(1)} g
+                  </p>
+                </div>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => handleRemoveFood(item)}
+                  aria-label="Remove item"
+                  className="p-1"
+                >
+                  <FiTrash2 size={14} />
+                </Button>
+              </div>
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+      )}
+    </Card>
+  );
 };
 
 // --- Main FoodTracker Component (Exported as default for Step 1) ---

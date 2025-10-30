@@ -9,7 +9,7 @@ import { FaYoutube, FaGooglePlay } from 'react-icons/fa';
 const AppFooter = () => {
   // Placeholder links - replace with your actual links
   const playStoreLink = "https://play.google.com/store/apps/details?id=com.vinodh2.doc";
-  const youtubeLink = "https://www.youtube.com/@vk2"; 
+  const youtubeLink = "https://www.youtube.com/@Vk2Studios"; 
 
   return (
     <footer className="mt-5 border-top pt-4 pb-3 bg-light">
