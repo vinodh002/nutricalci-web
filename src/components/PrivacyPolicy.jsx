@@ -4,6 +4,7 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import AppFooter from "../components/AppFooter";
 import AppNavbar from "../components/AppNavbar"; // Added for consistent structure
+import AdBanner728 from "../Ads/AdBanner728";
 
 const PrivacyPolicyPage = () => {
   return (
@@ -63,6 +64,7 @@ const PrivacyPolicyPage = () => {
         </p>
              {" "}
       </Container>
+      <AdBanner728/>
             <AppFooter />   {" "}
     </div>
   );
