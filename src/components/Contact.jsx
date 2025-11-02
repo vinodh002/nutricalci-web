@@ -5,6 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
 import AppFooter from '../components/AppFooter';
 import AppNavbar from './AppNavbar';
+import AdBanner728 from '../Ads/AdBanner728';
 
 const ContactPage = () => {
   return (
@@ -30,6 +31,7 @@ const ContactPage = () => {
           </p>
         </Card>
       </Container>
+      <AdBanner728/>
       <AppFooter />
     </div>
   );

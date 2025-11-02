@@ -5,6 +5,7 @@ import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 import AppFooter from "../components/AppFooter";
 import AppNavbar from "../components/AppNavbar"; // Added for consistent structure
+import AdBanner728 from "../Ads/AdBanner728";
 
 const AboutPage = () => {
   return (
@@ -71,6 +72,7 @@ const AboutPage = () => {
         </Card>
              {" "}
       </Container>
+      <AdBanner728/>
             <AppFooter />   {" "}
     </div>
   );

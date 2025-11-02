@@ -1,4 +1,4 @@
-// src/App.jsx (Updated - Professional Welcome Description)
+// src/App.jsx (FINAL CODE WITH SIDEBAR LAYOUT)
 
 import { useState, useMemo } from "react";
 import { FiRefreshCw, FiCpu } from "react-icons/fi";
@@ -7,16 +7,17 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
-import Alert from "react-bootstrap/Alert"; // Using Alert for a polished, professional box
+import Alert from "react-bootstrap/Alert";
 
 // Custom components
 import NeedsCalculator from "./components/NeedsCalculator.jsx";
 import FoodTracker, { Totals, MealList } from "./components/FoodTracker.jsx";
 import AppFooter from "./components/AppFooter.jsx";
 import AppNavbar from "./components/AppNavbar.jsx";
-
 // Data Hook
 import useFirebaseData from "./useFirebaseData.js";
+import AdBanner728 from "./Ads/AdBanner728.jsx";
+import SidebarAd160x600 from "./Ads/SidebarAd160x600.jsx";
 
 // --- LOGIC (REMAINS THE SAME) ---
 const getRecommendedValues = (
@@ -27,8 +28,6 @@ const getRecommendedValues = (
   workType,
   rules
 ) => {
-  // ... (Your existing LOGIC remains here) ...
-
   const numAge = parseFloat(age);
 
   if (isNaN(numAge) || numAge <= 0) {
@@ -44,13 +43,11 @@ const getRecommendedValues = (
     };
   }
 
-  // Determine the TARGET status string.
   let targetStatus = femaleStatus;
   if (femaleStatus === "lactating") {
     targetStatus = `lactating_${lactationPeriod.replace("-", "_")}`;
   }
 
-  // Find the matching rule
   const recommendation = rules.find((rule) => {
     const ruleMinAge = parseFloat(rule.minAge);
     const ruleMaxAge = parseFloat(rule.maxAge);
@@ -92,7 +89,7 @@ const getRecommendedValues = (
 // --- END OF LOGIC ---
 
 function App() {
-  // ... (All State, Hooks, and Handlers remain the same) ...
+  // ... (State definitions remain the same) ...
   const { foodData, recommendations, isLoading, error } = useFirebaseData();
   const [selectedFoodId, setSelectedFoodId] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
@@ -115,7 +112,9 @@ function App() {
     return foodData.find((food) => food.id === selectedFoodId);
   }, [selectedFoodId, foodData]);
 
-  const currentOptions = currentFood ? currentFood.options : []; // ... (All Handlers and Derived States remain the same) ...
+  const currentOptions = currentFood ? currentFood.options : [];
+
+  // ... (Handlers and Derived States remain the same) ...
   const handleCalculateNeeds = () => {
     const numAge = parseFloat(age);
     const numWeight = parseFloat(weight);
@@ -206,10 +205,12 @@ function App() {
     return (
       <Container className="my-5 text-center">
                 <h1 className="text-primary">Loading Data... ⏳</h1>           {" "}
+               {" "}
         <p className="lead">
-          Fetching latest nutritional guidelines and food items.
+                    Fetching latest nutritional guidelines and food items.      
+           {" "}
         </p>
-             {" "}
+                           {" "}
       </Container>
     );
   }
@@ -217,17 +218,19 @@ function App() {
   if (error) {
     return (
       <Container className="my-5">
-               {" "}
+                               {" "}
         <Alert variant="danger" className="text-center">
-                    <h4 className="alert-heading">Data Fetch Error! 🛑</h4>     
+                             {" "}
+          <h4 className="alert-heading">Data Fetch Error! 🛑</h4>               
                     <p>Could not load data from Firebase: {error}</p>
-                    <hr />                   {" "}
+                              <hr />                             {" "}
           <p className="mb-0">
-            Please check your Firebase configuration and network connection.
+                        Please check your Firebase configuration and network
+            connection.          {" "}
           </p>
-                 {" "}
+                                   {" "}
         </Alert>
-             {" "}
+                           {" "}
       </Container>
     );
   }
@@ -239,60 +242,72 @@ function App() {
         className="my-4 my-md-5 flex-grow-1"
         style={{ maxWidth: "1200px" }}
       >
-               {/* 🛑 CRITICAL FIX: PROFESSIONAL INSTRUCTIONAL DESCRIPTION */} 
-             {" "}
-        <Row className="justify-content-center mb-4">
-                   {" "}
-          <Col md={10} lg={8}>
-            <Alert variant="light" className="p-4 shadow-sm border-0 bg-light">
-              <h2 className="h4 text-success mb-3">Welcome to Nutri Calci</h2>
-              <p className="fw-medium text-dark">
-                This application is designed to help doctors, nutritionists,
-                and enthusiasts quickly calculate and track daily Calorie
-                and Protein requirements based on the latest authoritative
-                guidelines from the National Institute of Nutrition (NIN).
-              </p>
-              <hr className="my-3" />
-              <p className="fw-semibold mb-2">
-                Follow the steps below to manage your intake:
-              </p>
-              <ol className="list-unstyled mb-0 small ps-3">
-                <li>
-                  <span className="text-primary fw-bold">1. Add Meals:</span>{" "}
-                  Select food items and serving sizes to build your meal list.
-                </li>
-                <li>
-                  <span className="text-primary fw-bold">2. View Totals:</span>{" "}
-                  See the running total of calories and protein consumed.
-                </li>
-                <li>
-                  <span className="text-primary fw-bold">
-                    3. Calculate Needs:
-                  </span>{" "}
-                  Input age, gender, and status to determine your NIN-based
-                  targets.
-                </li>
-                <li>
-                  <span className="text-primary fw-bold">
-                    4. Compare against Targets:
-                  </span>{" "}
-                  View the difference between your consumption and your required
-                  daily needs.
-                </li>
-              </ol>
-            </Alert>
-                     {" "}
-          </Col>
-                 {" "}
-        </Row>
-                       {" "}
-        <Row className="justify-content-center">
-                   {" "}
-          <Col md={10} lg={8}>
-                        {/* 1. Add Food to Meal (Step 1) */}                   
-               {" "}
+        {/* 🛑 MAIN LAYOUT: SPLIT INTO CONTENT (8) AND SIDEBAR (4) */}
+        <Row>
+          {/* 🛑 LEFT COLUMN: MAIN CALCULATOR CONTENT (8/12) */}
+          <Col md={12} lg={8}>
+            {/* 1. INSTRUCTIONAL DESCRIPTION */}
+            <Row className="justify-content-center mb-4">
+              <Col xs={12}>
+                <Alert
+                  variant="light"
+                  className="p-4 shadow-sm border-0 bg-light"
+                >
+                  <h2 className="h4 text-success mb-3">
+                    Welcome to Nutri Calci
+                  </h2>
+                  <p className="fw-medium text-dark">
+                    This application is designed to help doctors, nutritionists,
+                    and enthusiasts quickly calculate and track daily Calorie
+                    and Protein requirements based on the latest authoritative
+                    guidelines from the National Institute of Nutrition (NIN).
+                  </p>
+                  <hr className="my-3" />
+                  <p className="fw-semibold mb-2">
+                    Follow the steps below to manage your intake:
+                  </p>
+                  <ol className="list-unstyled mb-0 small ps-3">
+                    <li>
+                      <span className="text-primary fw-bold">
+                        1. Add Meals:
+                      </span>{" "}
+                      Select food items and serving sizes to build your meal
+                      list.
+                    </li>
+                    <li>
+                      <span className="text-primary fw-bold">
+                        2. View Totals:
+                      </span>{" "}
+                      See the running total of calories and protein consumed.
+                    </li>
+                    <li>
+                      <span className="text-primary fw-bold">
+                        3. Calculate Needs:
+                      </span>{" "}
+                      Input age, gender, and status to determine your NIN-based
+                      targets.
+                    </li>
+                    <li>
+                      <span className="text-primary fw-bold">
+                        4. Compare against Targets:
+                      </span>{" "}
+                      View the difference between your consumption and your
+                      required daily needs.
+                    </li>
+                  </ol>
+                </Alert>
+              </Col>
+            </Row>
+
+            {/* 🛑 PLACEMENT 1: HORIZONTAL BANNER (728x90) */}
+            <Row className="justify-content-center mb-4">
+              <Col xs={12}>
+                <AdBanner728 />
+              </Col>
+            </Row>
+
+            {/* 1. Add Food to Meal (Step 1) */}
             <Card className="shadow mb-4">
-                           {" "}
               <FoodTracker
                 foodData={foodData}
                 selectedFoodId={selectedFoodId}
@@ -303,23 +318,19 @@ function App() {
                 handleAddFood={handleAddFood}
                 stepNumber={1}
               />
-                         {" "}
             </Card>
-                        {/* 2. Today's Meal Items (Step 2) */}                 
-                 {" "}
+
+            {/* 2. Today's Meal Items (Step 2) */}
             <div className="mb-4">
-                           {" "}
               <MealList
                 mealList={mealList}
                 handleRemoveFood={handleRemoveFood}
                 stepNumber={2}
               />
-                         {" "}
             </div>
-                        {/* 3. Calculate Daily Needs (Step 3) */}               
-                   {" "}
+
+            {/* 3. Calculate Daily Needs (Step 3) */}
             <div className="mb-4">
-                           {" "}
               <NeedsCalculator
                 age={age}
                 setAge={setAge}
@@ -339,11 +350,10 @@ function App() {
                 showWorkType={showWorkType}
                 stepNumber={3}
               />
-                         {" "}
             </div>
-                        {/* 4. View Totals (Step 4) */}                       {" "}
+
+            {/* 4. View Totals (Step 4) */}
             <div className="mb-4">
-                           {" "}
               <Totals
                 dailyNeeds={dailyNeeds}
                 totals={totals}
@@ -351,15 +361,24 @@ function App() {
                 handleReset={handleReset}
                 stepNumber={4}
               />
-                         {" "}
             </div>
-                     {" "}
           </Col>
-                 {" "}
+
+          {/* 🛑 RIGHT COLUMN: SIDEBAR AD (4/12, Hidden on small screens) */}
+          <Col lg={4} className="d-none d-lg-block">
+            <div className="sticky-top pt-5" style={{ top: "60px" }}>
+              <h5 className="text-muted text-center mb-3">Advertisement</h5>
+              {/* 🛑 SIDEBAR AD PLACEMENT: Use the 160x600 component here */}
+              <SidebarAd160x600 />
+              <p className="small text-center mt-2 text-muted">
+                Supports our free service.
+              </p>
+            </div>
+          </Col>
         </Row>
              {" "}
       </Container>
-                            <AppFooter />           {" "}
+                        <AppFooter />               {" "}
     </div>
   );
 }
