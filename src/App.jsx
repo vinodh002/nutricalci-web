@@ -1,4 +1,4 @@
-// src/App.jsx (FINAL CODE WITH SIDEBAR LAYOUT)
+// src/App.jsx (FINAL AD CONFLICT FIX)
 
 import { useState, useMemo } from "react";
 import { FiRefreshCw, FiCpu } from "react-icons/fi";
@@ -14,10 +14,13 @@ import NeedsCalculator from "./components/NeedsCalculator.jsx";
 import FoodTracker, { Totals, MealList } from "./components/FoodTracker.jsx";
 import AppFooter from "./components/AppFooter.jsx";
 import AppNavbar from "./components/AppNavbar.jsx";
-// Data Hook
-import useFirebaseData from "./useFirebaseData.js";
+
+// 🛑 AD IMPORTS (Assuming they are in the Ads/ directory)
 import AdBanner728 from "./Ads/AdBanner728.jsx";
 import SidebarAd160x600 from "./Ads/SidebarAd160x600.jsx";
+
+// Data Hook
+import useFirebaseData from "./useFirebaseData.js";
 
 // --- LOGIC (REMAINS THE SAME) ---
 const getRecommendedValues = (
@@ -89,7 +92,6 @@ const getRecommendedValues = (
 // --- END OF LOGIC ---
 
 function App() {
-  // ... (State definitions remain the same) ...
   const { foodData, recommendations, isLoading, error } = useFirebaseData();
   const [selectedFoodId, setSelectedFoodId] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
@@ -114,7 +116,6 @@ function App() {
 
   const currentOptions = currentFood ? currentFood.options : [];
 
-  // ... (Handlers and Derived States remain the same) ...
   const handleCalculateNeeds = () => {
     const numAge = parseFloat(age);
     const numWeight = parseFloat(weight);
@@ -199,18 +200,16 @@ function App() {
     (gender === "female" &&
       femaleStatus === "normal" &&
       numAge >= 14 &&
-      numAge <= 60); // --- Loading and Error State Handling (omitted for brevity) ---
+      numAge <= 60);
 
+  // --- Loading and Error State Handling (omitted for brevity) ---
   if (isLoading || recommendations.length === 0) {
     return (
       <Container className="my-5 text-center">
-                <h1 className="text-primary">Loading Data... ⏳</h1>           {" "}
-               {" "}
+        <h1 className="text-primary">Loading Data... ⏳</h1>
         <p className="lead">
-                    Fetching latest nutritional guidelines and food items.      
-           {" "}
+          Fetching latest nutritional guidelines and food items.
         </p>
-                           {" "}
       </Container>
     );
   }
@@ -218,26 +217,21 @@ function App() {
   if (error) {
     return (
       <Container className="my-5">
-                               {" "}
         <Alert variant="danger" className="text-center">
-                             {" "}
-          <h4 className="alert-heading">Data Fetch Error! 🛑</h4>               
-                    <p>Could not load data from Firebase: {error}</p>
-                              <hr />                             {" "}
+          <h4 className="alert-heading">Data Fetch Error! 🛑</h4>
+          <p>Could not load data from Firebase: {error}</p>
+          <hr />
           <p className="mb-0">
-                        Please check your Firebase configuration and network
-            connection.          {" "}
+            Please check your Firebase configuration and network connection.
           </p>
-                                   {" "}
         </Alert>
-                           {" "}
       </Container>
     );
   }
 
   return (
     <div className="d-flex flex-column min-vh-100">
-            <AppNavbar />           {" "}
+      <AppNavbar />
       <Container
         className="my-4 my-md-5 flex-grow-1"
         style={{ maxWidth: "1200px" }}
@@ -260,7 +254,8 @@ function App() {
                     This application is designed to help doctors, nutritionists,
                     and enthusiasts quickly calculate and track daily Calorie
                     and Protein requirements based on the latest authoritative
-                    guidelines from the National Institute of Nutrition (NIN).
+                    guidelines from the **National Institute of Nutrition
+                    (NIN)**.
                   </p>
                   <hr className="my-3" />
                   <p className="fw-semibold mb-2">
@@ -299,7 +294,7 @@ function App() {
               </Col>
             </Row>
 
-            {/* 🛑 PLACEMENT 1: HORIZONTAL BANNER (728x90) */}
+            {/* 🛑 PLACEMENT 1: HORIZONTAL BANNER (728x90) MOVED INSIDE LEFT COLUMN */}
             <Row className="justify-content-center mb-4">
               <Col xs={12}>
                 <AdBanner728 />
@@ -366,15 +361,13 @@ function App() {
 
           {/* 🛑 RIGHT COLUMN: SIDEBAR AD (4/12, Hidden on small screens) */}
           <Col lg={4} className="d-none d-lg-block">
-            <div className="sticky-top pt-5" style={{ top: "60px" }}>
-              {/* 🛑 SIDEBAR AD PLACEMENT: Use the 160x600 component here */}
+            <div className="sticky-top pt-5 mb-5" style={{ top: "60px" }}>
               <SidebarAd160x600 />
             </div>
           </Col>
         </Row>
-             {" "}
       </Container>
-      <AdBanner728 />
+
       <AppFooter />
     </div>
   );

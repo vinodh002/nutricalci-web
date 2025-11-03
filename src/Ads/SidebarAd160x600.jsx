@@ -1,47 +1,62 @@
-// src/components/SidebarAd160x600.jsx (Final Simpler Fix)
+// src/components/SidebarAd160x600.jsx (FINAL ROBUST VERSION)
 
 import React, { useEffect, useRef } from 'react';
 
 const SidebarAd160x600 = () => {
     const adContainerRef = useRef(null);
-    const adId = 'sidebar-160x600-container'; // Unique ID for the container
-    const key = '05f17c73e1ae1b882f57c546064b92fe'; // Key for 160x600 unit
+    const adId = 'sidebar-160x600-container'; 
+    const key = '05f17c73e1ae1b882f57c546064b92fe'; 
+
+    const loadAdScript = () => {
+        if (!adContainerRef.current) return;
+        
+        // 1. Define atOptions globally 
+        window.atOptions = window.atOptions || {};
+        window.atOptions = {
+            'key': key,
+            'format': 'iframe',
+            'height': 600,
+            'width': 160,
+            'params': {},
+            'containerId': adId // Include container ID
+        };
+
+        // 2. Inject the specific script manually
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = `//www.highperformanceformat.com/${key}/invoke.js`; 
+        script.async = true;
+        script.defer = true;
+        
+        // 3. Inject only if the container is empty
+        if (adContainerRef.current.children.length === 0) {
+             adContainerRef.current.appendChild(script);
+        }
+    };
 
     useEffect(() => {
-        if (adContainerRef.current && adContainerRef.current.children.length === 0) {
-            adContainerRef.current.id = adId;
-
-            // 🛑 CRITICAL FIX: Define atOptions as a simple global variable before injecting the script
-            window.atOptions = {
-                'key': key,
-                'format': 'iframe',
-                'height': 600,
-                'width': 160,
-                'params': {},
-                 // Include the container ID in the options, as some networks require this
-                'containerId': adId 
-            };
-            
-            // Inject the script locally (no need to use the one in index.html)
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = `//www.highperformanceformat.com/${key}/invoke.js`;
-            script.async = true;
-            script.defer = true;
-            
-            adContainerRef.current.appendChild(script);
+        // Set the ID when the component mounts
+        if (adContainerRef.current) {
+             adContainerRef.current.id = adId;
         }
-        
-        // Cleanup function (remains the same)
+
+        // Run the load function immediately and again after a short delay for reliability
+        loadAdScript();
+        const timer = setTimeout(loadAdScript, 1000); // Re-trigger load after 1s for SPA routers
+
         return () => {
-            if (adContainerRef.current && adContainerRef.current.lastChild) {
+            clearTimeout(timer);
+            // On cleanup, ensure the container is reset to allow clean re-render
+            if (adContainerRef.current) {
                 adContainerRef.current.innerHTML = '';
             }
         };
     }, []); 
 
+    // 4. Return the container element with reserved space (160x600)
     return (
         <div className="d-flex justify-content-center" 
+             // IMPORTANT: Set explicit dimensions to reserve space
              style={{ width: '160px', minHeight: '600px', margin: '0 auto' }} 
              ref={adContainerRef}>
         </div>
