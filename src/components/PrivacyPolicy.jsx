@@ -16,7 +16,7 @@ const PrivacyPolicyPage = () => {
           <p className="text-muted small">Effective Date: November 2, 2025</p>
         {/* --- Section 1: Data Handling (Crucial) --- */}       {" "}
         <h2 className="h4 mt-4 text-primary">
-          1. Information We Collect and Store
+          Information We Collect and Store
         </h2>
                {" "}
         <p>
@@ -44,7 +44,7 @@ const PrivacyPolicyPage = () => {
           application's performance and design.        {" "}
         </p>
         {/* --- Section 2: Advertising (AdSense Requirement) --- */}       {" "}
-        <h2 className="h4 mt-4 text-primary">
+        {/* <h2 className="h4 mt-4 text-primary">
           2. Third-Party Advertising
         </h2>
                {" "}
@@ -55,9 +55,9 @@ const PrivacyPolicyPage = () => {
           the <span className="fw-bold">DART cookie</span>). You may opt out of
           the use of the DART cookie by visiting the Google Ad and Content
           Network Privacy Policy.        {" "}
-        </p>
+        </p> */}
         {/* --- Section 3: Consent --- */}       {" "}
-        <h2 className="h4 mt-4 text-primary">3. Your Consent</h2>       {" "}
+        <h2 className="h4 mt-4 text-primary">Your Consent</h2>       {" "}
         <p>
                     By using our website, you hereby consent to our Privacy
           Policy and agree to its terms.        {" "}
