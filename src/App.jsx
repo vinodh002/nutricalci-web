@@ -367,18 +367,15 @@ function App() {
           {/* 🛑 RIGHT COLUMN: SIDEBAR AD (4/12, Hidden on small screens) */}
           <Col lg={4} className="d-none d-lg-block">
             <div className="sticky-top pt-5" style={{ top: "60px" }}>
-              <h5 className="text-muted text-center mb-3">Advertisement</h5>
               {/* 🛑 SIDEBAR AD PLACEMENT: Use the 160x600 component here */}
               <SidebarAd160x600 />
-              <p className="small text-center mt-2 text-muted">
-                Supports our free service.
-              </p>
             </div>
           </Col>
         </Row>
              {" "}
       </Container>
-                        <AppFooter />               {" "}
+      <AdBanner728 />
+      <AppFooter />
     </div>
   );
 }
