@@ -1,47 +1,49 @@
-// src/components/SidebarAd160x600.jsx
+// src/components/SidebarAd160x600.jsx (Final Simpler Fix)
 
 import React, { useEffect, useRef } from 'react';
 
 const SidebarAd160x600 = () => {
-    // 1. Reference for the container element where the ad will load
     const adContainerRef = useRef(null);
-    // Use the unique key from the script URL to ensure the ad loads correctly
-    const adId = 'sidebar-160x600-05f17c73e1ae1b882f57c546064b92fe'; 
+    const adId = 'sidebar-160x600-container'; // Unique ID for the container
+    const key = '05f17c73e1ae1b882f57c546064b92fe'; // Key for 160x600 unit
 
     useEffect(() => {
-        // 2. Define the ad options object (your provided code)
-        const atOptions = {
-            'key': '05f17c73e1ae1b882f57c546064b92fe',
-            'format': 'iframe',
-            'height': 600,
-            'width': 160,
-            'params': {}
-        };
-        
-        if (adContainerRef.current) {
-            // 3. Attach the options to the window object, associated with a unique key
-            window.atOptions = window.atOptions || {};
-            window.atOptions[adId] = atOptions;
-
-            // 4. Set the container ID for the global invoke script to target
+        if (adContainerRef.current && adContainerRef.current.children.length === 0) {
             adContainerRef.current.id = adId;
 
-            // 5. If the ad hasn't loaded (common in SPAs after initial render), 
-            // you can try to trigger a manual refresh or append a temporary script 
-            // to ensure the ad network detects the new container. 
-            // For now, setting the ID and options should be enough since the global 
-            // invoke script is loaded in index.html.
+            // 🛑 CRITICAL FIX: Define atOptions as a simple global variable before injecting the script
+            window.atOptions = {
+                'key': key,
+                'format': 'iframe',
+                'height': 600,
+                'width': 160,
+                'params': {},
+                 // Include the container ID in the options, as some networks require this
+                'containerId': adId 
+            };
+            
+            // Inject the script locally (no need to use the one in index.html)
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = `//www.highperformanceformat.com/${key}/invoke.js`;
+            script.async = true;
+            script.defer = true;
+            
+            adContainerRef.current.appendChild(script);
         }
-
+        
+        // Cleanup function (remains the same)
+        return () => {
+            if (adContainerRef.current && adContainerRef.current.lastChild) {
+                adContainerRef.current.innerHTML = '';
+            }
+        };
     }, []); 
 
-    // 6. Return the container element with reserved space (160x600)
     return (
         <div className="d-flex justify-content-center" 
-             // Set the exact width/height to reserve space for the ad, preventing content shift
              style={{ width: '160px', minHeight: '600px', margin: '0 auto' }} 
              ref={adContainerRef}>
-            {/* The 160x600 ad will load inside this div */}
         </div>
     );
 };

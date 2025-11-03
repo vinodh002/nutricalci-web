@@ -45,7 +45,7 @@ const PrivacyPolicyPage = () => {
         </p>
         {/* --- Section 2: Advertising (AdSense Requirement) --- */}       {" "}
         <h2 className="h4 mt-4 text-primary">
-          2. Third-Party Advertising (Google AdSense)
+          2. Third-Party Advertising
         </h2>
                {" "}
         <p>
